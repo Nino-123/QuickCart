@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 let cached = global.mongoose
 
-if (cached) {
+if (!cached) {
     cached = global.mongoose = { conn: null, promise: null }
 }
 
@@ -12,7 +12,7 @@ async function connectDB() {
         return cached.conn
     }
 
-    if (cached.promise) {
+    if (!cached.promise) {
         const opts = {
             bufferCommands:false
         }

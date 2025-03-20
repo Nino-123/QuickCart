@@ -5,6 +5,7 @@ import User from "@/models/User";
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "quickcart-next" });
 
+//save user data to a database
 export const syncUserCreation = inngest.createFunction(
     {
         id:'synce-user-from-clerk'
@@ -14,9 +15,9 @@ export const syncUserCreation = inngest.createFunction(
         const { id, first_name, last_name, email_addresses, iamge_url } = event.data
         const userData = {
             _id:id,
-            email: email_addresser[0].email_addresses,
+            email: email_addresses[0].email_addresses,
             name: first_name + ' ' + last_name,
-            imageUrl:iamge_url
+            imageUrl: iamge_url
         }
         await connectDB()
         await User.create(userData)
@@ -33,9 +34,9 @@ export const syncUserUpdation = inngest.createFunction(
         const { id, first_name, last_name, email_addresses, iamge_url } = event.data
         const userData = {
             _id:id,
-            email: email_addresser[0].email_addresses,
+            email: email_addresses[0].email_addresses,
             name: first_name + ' ' + last_name,
-            imageUrl:iamge_url
+            imageUrl: iamge_url
         }
         await connectDB()
         await User.findByIdAndUpdate (id,userData)
