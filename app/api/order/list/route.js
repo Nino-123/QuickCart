@@ -16,9 +16,9 @@ export async function GET(request) {
 
         const orders = await Order.find({userId}).populate('address items.product')
 
-        return NewResponse.json({ success:true, orders })
+        return NextResponse.json({ success:true, orders })
 
     } catch (error) {
-        return NewResponse.json({ success:false, message: error.message })
+        return NextResponse.json({ success:false, message: error.message })
     }
 }
