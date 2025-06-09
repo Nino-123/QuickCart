@@ -7,7 +7,6 @@ import Footer from "@/components/seller/Footer";
 import Loading from "@/components/Loading";
 import { get } from "mongoose";
 import axios from "axios";
-import { set } from "@/src/app";
 import toast from "react-hot-toast";
 
 const Orders = () => {

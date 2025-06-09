@@ -14,9 +14,7 @@ cloudinary.config({
 
 export async function POST(request) {
     try {
-        
         const { userId } = getAuth(request)
-        
         const isSeller = await authSeller(userId)
 
         if (!isSeller) {
@@ -24,13 +22,11 @@ export async function POST(request) {
         }
 
         const formData = await request.formData()
-
         const name = formData.get('name');
         const description = formData.get('description');
         const category = formData.get('category');
         const price = formData.get('price');
         const offerprice = formData.get('offerprice');
-
         const files = formData.getAll('images');
 
         if (!files || files.length === 0) {
@@ -41,7 +37,6 @@ export async function POST(request) {
             files.map(async (file) => {
                 const arrayBuffer = await file.arrayBuffer()
                 const buffer = Buffer.from(arrayBuffer)
-                
                 return new Promise((resolve, reject) => {
                     const stream = cloudinary.uploader.upload_stream(
                         {resource_type: 'auto'},
@@ -74,8 +69,7 @@ export async function POST(request) {
 
         return NextResponse.json({ success: true, message: 'Product added successfully', newProduct });
 
-
     } catch (error) {
-        NextResponse.json({ success: false, message: error.message });
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
     }
 }
