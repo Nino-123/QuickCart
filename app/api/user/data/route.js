@@ -9,7 +9,7 @@ export async function GET(request) {
 
         await connectDB();
         // FIX: Find by Clerk userId, not MongoDB _id
-        const user = await User.findById({ userId });
+        const user = await User.findById( userId );
 
         if (!user) {
             return NextResponse.json({ success: false, message: "User not found" });
