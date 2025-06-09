@@ -12,6 +12,9 @@ export async function GET(request) {
 
         await connectDB();
         // FIX: Find by Clerk userId, not MongoDB _id
+        const users = await User.find({});
+        console.log("All users in DB:", users);
+        
         const user = await User.findById( userId );
 
         if (!user) {
