@@ -1,0 +1,38 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'QuickCart/**'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'QuickCart/**'
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm config set registry https://registry.npmjs.org/
+        npm install --no-git-tag-version
+    
+    - name: Run tests
+      run: npm test
+    
+    - name: Upload coverage reports
+      if: always()
+      uses: codecov/codecov-action@v3
