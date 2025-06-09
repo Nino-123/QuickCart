@@ -41,7 +41,7 @@ const Orders = () => {
 
     useEffect(() => {
         if (user) {
-            fetcherSellerOrders();
+            fetchSellerOrders();
         }
     }, []);
 
