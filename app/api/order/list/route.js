@@ -2,8 +2,7 @@ import connectDB from "@/config/db";
 import Product from "@/models/Product";
 import { getAuth } from "@clerk/nextjs/server";
 import Address from "@/models/Address";
-
-
+import Order from "@/models/Order";
 
 export async function GET(request) {
     try {
@@ -15,9 +14,11 @@ export async function GET(request) {
         Address.length
         Product.length
 
-        const orders = await order
+        const orders = await Order.find({userId}).populate('address items.product')
+
+        return NewResponse.json({ success:true, orders })
 
     } catch (error) {
-        
+        return NewResponse.json({ success:false, message: error.message })
     }
 }
