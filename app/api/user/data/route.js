@@ -7,6 +7,9 @@ export async function GET(request) {
     try {
         const { userId } = getAuth(request);
 
+        // Add this log:
+        console.log("Requested userId:", userId);
+
         await connectDB();
         // FIX: Find by Clerk userId, not MongoDB _id
         const user = await User.findById( userId );
