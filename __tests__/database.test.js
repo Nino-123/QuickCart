@@ -1,51 +1,52 @@
-const { Pool } = require('pg');
-const app = require('../src/app');
 const request = require('supertest');
+const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
-describe('Database Integration Tests', () => {
-  let pool;
+const app = require('../src/app'); // Make sure this exports your Express/Next.js app
+const User = require('../models/User'); // Adjust path to your User model
 
-  beforeAll(async () => {
-    pool = new Pool({
-      host: process.env.TEST_DB_HOST || 'localhost',
-      port: process.env.TEST_DB_PORT || 5432,
-      database: process.env.TEST_DB_NAME || 'test_db',
-      user: process.env.TEST_DB_USER || 'test_user',
-      password: process.env.TEST_DB_PASSWORD || 'test_password',
-    });
-    // Create users table for testing
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) NOT NULL
-      )
-    `);
-  });
+let mongoServer;
 
-  afterAll(async () => {
-    // Drop users table and close DB connection
-    await pool.query('DROP TABLE IF EXISTS users');
-    await pool.end();
-  });
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  const uri = mongoServer.getUri();
+  await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+});
 
-  beforeEach(async () => {
-    // Clear table before each test
-    await pool.query('DELETE FROM users');
-  });
+afterAll(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
-  test('should create and retrieve user', async () => {
-    const userData = { email: 'test@example.com' };
-    // Create user via API
-    const createResponse = await request(app)
-      .post('/api/users')
-      .send(userData)
-      .expect(201);
-    expect(createResponse.body).toHaveProperty('id');
-    // Verify user exists in database
-    const dbResult = await pool.query('SELECT * FROM users WHERE id = $1', [
-      createResponse.body.id,
-    ]);
-    expect(dbResult.rows).toHaveLength(1);
-    expect(dbResult.rows[0].email).toBe(userData.email);
-  });
+beforeEach(async () => {
+  await User.deleteMany({});
+});
+
+test('should create and retrieve user', async () => {
+  const userData = {
+    _id: 'testid123',
+    name: 'Test User',
+    email: 'test@example.com',
+    imageUrl: 'https://example.com/image.png',
+    cartItems: {}
+  };
+  // Create user via API
+  const createResponse = await request(app)
+    .post('/api/users')
+    .send(userData)
+    .expect(201);
+  expect(createResponse.body).toHaveProperty('_id');
+  // Verify user exists in database
+  const dbUser = await User.findById(createResponse.body._id);
+  expect(dbUser).not.toBeNull();
+  expect(dbUser.email).toBe(userData.email);
+});
+
+test('should return 400 if required fields are missing', async () => {
+  const incompleteUser = { email: 'incomplete@example.com' }; // missing _id, name, imageUrl
+  const response = await request(app)
+    .post('/api/users')
+    .send(incompleteUser)
+    .expect(400);
+  expect(response.body).toHaveProperty('error');
 });
