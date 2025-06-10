@@ -16,7 +16,7 @@
     "test:ci": "jest --coverage --watchAll=false"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.12.6",
+    "@clerk/nextjs": "^6.21.0",
     "axios": "^1.9.0",
     "cloudinary": "^2.6.1",
     "cors": "^2.8.5",
