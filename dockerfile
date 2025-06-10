@@ -11,8 +11,6 @@ RUN npm install
 # Copy the rest of your app
 COPY . .
 
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_ZW5hYmxpbmctc2hlZXAtNDQuY2xlcmsuYWNjb3VudHMuZGV2JA
-
 # Build Next.js app
 RUN printenv
 RUN npm run build
